@@ -11,7 +11,8 @@ const GraphCodes = () => {
     good: "rgba(54, 235, 93, 0.5)",
     redirects: "rgba(229, 235, 54, 0.5)",
     badrequests: "rgba(166, 54, 235, 0.5)",
-    servererrors: "rgba(235, 54, 69, 0.5)"
+    servererrors: "rgba(235, 100, 69, 0.5)",
+    timeouterrors: "rgba(255, 0, 0, 0.5)"
   };
 
   const mapChartData = () => {
@@ -22,6 +23,7 @@ const GraphCodes = () => {
     const redirects = [];
     const badrequests = [];
     const servererrors = [];
+    const timeouts = []
     intermediate.forEach((item: ReportItem) => {
       let d = new Date(item.timestamp.toString());
       labels.push(d.toLocaleString());
@@ -54,6 +56,14 @@ const GraphCodes = () => {
       redirects.push(http300s);
       badrequests.push(http400s);
       servererrors.push(http500s);
+      timeouts.push(item.errors["ETIMEDOUT"] ?? 0);
+    });
+    datasets.push({
+      label: "Timeouts",
+      data: timeouts,
+      fill: false,
+      borderColor: colors.timeouterrors,
+      yAxisID: "y-axis-0"
     });
     datasets.push({
       label: "100s",
