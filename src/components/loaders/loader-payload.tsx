@@ -5,6 +5,7 @@ const LoaderPayload = () => {
   const context = useContext(ReportContext);
   const inputEl = useRef(null);
   const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("")
 
   const uploadAction = () => {
     inputEl.current.click();
@@ -27,12 +28,13 @@ const LoaderPayload = () => {
         var jsonData = JSON.parse(x);
         // @ts-ignore
         context.loadReport(jsonData, newfile.name);
-      } catch (err) {
+      } catch (error) {
         resetState();
+        setErrorMessage(error.message);
         setHasError(true);
         setTimeout(function () {
           setHasError(false);
-        }, 3000);
+        }, 9000);
       }
     });
   };
@@ -83,7 +85,7 @@ const LoaderPayload = () => {
       </div>
       { hasError &&  
           <div className="alert alert-danger mr-2 ml-2 mt-3 mb-4">
-            Error loading report file. Please verify the json file is complete.
+            Error loading report file. Please verify the json file is complete: {errorMessage}
           </div>
       }
     </Fragment>

@@ -3,7 +3,7 @@
 const mapToLegacyObject = (src) => {
   return {
     aggregate: _mapToLegacyBaseLevelObject(src.aggregate),
-    intermediate: _mapToLegacyIntermediate(src)
+    intermediate: _mapToLegacyIntermediate(src),
   };
 };
 
@@ -11,50 +11,63 @@ const mapToLegacyObject = (src) => {
 
 const _mapToLegacyBaseLevelObject = (src) => {
   return {
-    timestamp: new Date(src.period),
-    scenariosCreated: src.counters["core.vusers.created.total"] || 0,
-    scenariosCompleted: src.counters["core.vusers.completed"] || 0,
-    scenariosAvoided: src.counters["core.vusers.skipped"] || 0,
+    timestamp: new Date(getIntegerDate(src.period)),
+    scenariosCreated:
+      src.counters["vusers.created"] ||
+      src.counters["core.vusers.created.total"] ||
+      0,
+    scenariosCompleted:
+      src.counters["vusers.completed"] ||
+      src.counters["core.vusers.completed"] ||
+      0,
+    scenariosAvoided:
+      src.counters["vusers.skipped"] ||
+      src.counters["core.vusers.skipped"] ||
+      0,
     requestsCompleted:
+      src.counters["http.responses"] ||
       src.counters["engine.http.responses"] ||
       src.counters["engine.socketio.emit"] ||
       src.counters["engine.websocket.messages_sent"] ||
       0,
-    latency: _mapToLegacyLatency(src.summaries),
+    latency: _mapToLegacyLatency(src),
     rps: {
       mean: src.rates
-        ? src.rates["engine.http.response_rate"] ||
+        ? src.rates["http.request_rate"] ||
+          src.rates["engine.http.response_rate"] ||
           src.rates["engine.socketio.emit_rate"] ||
           0
         : 0,
       count:
+        src.counters["http.responses"] ||
         src.counters["engine.http.responses"] ||
         src.counters["engine.socketio.emit"] ||
-        0
+        0,
     },
     codes: _mapToLegacyCodes(src),
     errors: _mapToLegacyErrors(src),
-    phases: _mapToLegacyPhases(src)
+    phases: _mapToLegacyPhases(src),
   };
 };
 
-const _mapToLegacyLatency = (src) => {
-  var selector = "engine.http.response_time";
-  if (src["engine.http.socketio"]) {
-    selector = "engine.http.socketio";
-  }
+const _mapToLegacyLatency = (src_in) => {
+  const src = src_in.summaries;
+
+  const vals = src[Object.keys(src)[0]] || null;
+
   return {
-    min: src[selector].min,
-    max: src[selector].max,
-    median: src[selector].median,
-    p50: src[selector].median,
-    p95: src[selector].p95,
-    p99: src[selector].p99
+    min: vals ? vals.min : 0,
+    max: vals ? vals.max : 0,
+    median: vals ? vals.median : 0,
+    p50: vals ? vals.median : 0,
+    p95: vals ? vals.p95 : 0,
+    p99: vals ? vals.p99 : 0,
   };
 };
 
 const _mapToLegacyCodes = (src) => {
-  var propNameHttp = "engine.http.codes.";
+  var propNameHttp = "http.codes.";
+  //var propNameHttp = "engine.http.codes.";
   var propNameSocket = "engine.socketio.codes.";
   var dest = {};
   for (var prop in src.counters) {
@@ -92,6 +105,14 @@ const _mapToLegacyPhases = (src) => {
   return [];
 };
 
-export {
-  mapToLegacyObject
+const getIntegerDate = (period: any) => {
+  if (typeof period === "string") {
+    return parseInt(period);
+  } else if (typeof period === "number") {
+    return period;
+  } else {
+    throw new Error("invalid type for property period");
+  }
 };
+
+export { mapToLegacyObject };
