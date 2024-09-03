@@ -5,6 +5,7 @@ import { formatNumber } from "../utilities/formatters";
 import { 
     getHealthyStatusRating, 
     getHealthyStatusText,
+    getHealthyStatusStars,
     getPerformanceRating,
     getPerformanceText,
     getOverallRating
@@ -14,6 +15,7 @@ const Summary = () => {
     const context = useContext(ReportContext);
     const [healthRating, setHealthRating] = useState(0);
     const [perfRating, setPerfRating] = useState(0);
+    const [stars, setStars] = useState({filled: 0, empty: 0});
     const { aggregate } = context.report.results;
     const { isLoaded } = context;
     const getBadRequestCount = () => {
@@ -66,6 +68,9 @@ const Summary = () => {
             getSuccessPercent(),
             networkErrorCount
         );
+        const stars = getHealthyStatusStars(rating);
+        setStars(stars);
+
         setHealthRating(rating);
     };
     const calculatePerfRating = () => {
@@ -73,10 +78,12 @@ const Summary = () => {
         setPerfRating(rating);
     };
     const getFilledStars = () => {
-        return 0;
+        console.log('stars.filled', stars.filled);
+        return stars.filled;
     };
     const getEmptyStars = () => {
-        return 5;
+        console.log('stars.empty', stars.empty);
+        return stars.empty;
     };
     useEffect(() => {
         calculateHealthRating();
@@ -193,27 +200,22 @@ const Summary = () => {
                             </div>
                             <p className="card-category">Health &amp; Performance</p>
                             <h3 className="card-title">
-                                {/* {isLoaded && 
+                                {isLoaded && 
                                     `${getHealthyStatusText(healthRating)}`
-                                } */}
-                                Coming soon.
+                                }
                             </h3>
                         </div>
                         <div className="card-footer">
                             <div className="stats">
                                 Estimated health and performance
                             </div>
-                            {/* { isLoaded && 
+                            { isLoaded && 
                                 <span className="float-right">
                                     <span className="stats pr-3">Overall Rating:</span>
                                     {Array(getFilledStars()).fill(<i className="fas fa-star text-warning"></i>)}
                                     {Array(getEmptyStars()).fill(<i className="far fa-star text-muted"></i>)}
                                 </span>
-                            } */}
-                            <span className="float-right">
-                                <span className="stats pr-3">Overall Rating:</span>
-                                {Array(getEmptyStars()).fill(<i className="far fa-star text-muted"></i>)}
-                            </span>
+                            }
                         </div>
                     </div>
                 </div>

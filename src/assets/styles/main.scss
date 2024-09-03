@@ -5,3 +5,9 @@
 @import "./components/print.scss";
 @import "./components/header.scss";
 @import "./components/radio.scss";
+
+@media print {
+html, body {
+    display: inline-block;
+    }
+}

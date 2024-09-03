@@ -20,6 +20,16 @@ const getHealthyStatusText = (healthyRating: number): string => {
     return "Unhealthy";
 }
 
+const getHealthyStatusStars = (healthyRating: number): {filled: number, empty: number} => {
+    if(healthyRating > 900) { return {filled: 5, empty: 0}; }
+    if(healthyRating > 700) { return {filled: 4, empty: 1}; }
+    if(healthyRating > 500) { return {filled: 3, empty: 2}; }
+    if(healthyRating > 300) { return {filled: 2, empty: 3}; }
+    if(healthyRating > 100) { return {filled: 1, empty: 4}; }
+
+    return {filled: 0, empty: 5};
+}
+
 const getPerformanceRating = (rps: number, avgResponseTime: number): number => {
     const baseRating = 1000;
     const rpsGain = 20;
@@ -57,6 +67,7 @@ export {
     getHealthyStatusText,
     getPerformanceRating,
     getPerformanceText,
-    getOverallRating
+    getOverallRating,
+    getHealthyStatusStars
 };
   
